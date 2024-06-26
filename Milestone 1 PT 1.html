@@ -1,4 +1,4 @@
-Milestone 1
+Milestone 1 
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,6 +11,7 @@ Milestone 1
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Information</title>
     <style>
+
       .book-info {
         display: flex;
         margin: 20px;
@@ -26,50 +27,49 @@ Milestone 1
       .book-info .details {
         flex: 1;
       }
-    </style>
+
+      <!-- This is to center the webpage -->
+
+      .content {
+      max-width: 1000px;
+
+      margin: auto;
+      }
+
+      .textformat {
+
+    }
+
+    h1 {
+    text-align: center;
+
+    color: #4CAF50;
+    font-family: Garamond;
+    font-size: 50px;
+    padding:0px;
+    margin: 0px;
+
+    }
+
+    p {
+
+    text-align: left;
+    letter-spacing: 2.5px;
+    font-family: Garamond;
+    font-size: 22px;
+    border-style: dotted dashed solid double;
+    padding: 30px;
+
+    }
+
+    a {
+    text-decoration: none;
+    color: #008CBA;
+    }
+</style>
 </head>
 
-<!-- This is to center the webpage -->
-<style>
-  .content {
-  max-width: 1000px;
 
-  margin: auto;
-  }
-
-  .textformat {
-
-}
-
-h1 {
-text-align: center;
-
-color: #4CAF50;
-font-family: Garamond;
-font-size: 50px;
-padding:0px;
-margin: 0px;
-
-}
-
-p {
-
-text-align: left;
-letter-spacing: 2.5px;
-font-family: Garamond;
-font-size: 22px;
-border-style: dotted dashed solid double;
-padding: 30px;
-
-}
-
-a {
-text-decoration: none;
-color: #008CBA;
-}
-
-
-</style>
 
 <!--This is the content for my Nav Bar-->
 <ul>
@@ -84,10 +84,10 @@ color: #008CBA;
 <body>
   <div id="book-container"></div>
 
-  <!-- jQuery CDN (optional, if you decide to use jQuery for other functionality) -->
+  <!-- jQuery CDN -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-    // Your JavaScript code here
+
     // Fetch and display book information
     fetch('https://www.googleapis.com/books/v1/volumes/Wfan6L9RGgYC')
       .then(response => response.json())
