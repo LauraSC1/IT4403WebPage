@@ -1,0 +1,128 @@
+Milestone 1 Test
+<!DOCTYPE html>
+<html lang="en">
+
+<!--This is the Title and link to my CSS-->
+<head>
+    <title>Laura's Milestone 1</title>
+    <link rel="stylesheet" href="WebpageStyle.css">
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Information</title>
+    <style>
+      /* Add your CSS styles for book-info and details here */
+      .book-info {
+        display: flex;
+        margin: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .book-info img {
+        width: 200px;
+        height: 300px;
+        margin-right: 20px;
+      }
+      .book-info .details {
+        flex: 1;
+      }
+    </style>
+</head>
+
+<!-- This is to center the webpage -->
+<style>
+  .content {
+  max-width: 1000px;
+
+  margin: auto;
+  }
+
+  .textformat {
+
+}
+
+h1 {
+text-align: center;
+
+color: #4CAF50;
+font-family: Garamond;
+font-size: 50px;
+padding:0px;
+margin: 0px;
+
+}
+
+p {
+
+text-align: left;
+letter-spacing: 2.5px;
+font-family: Garamond;
+font-size: 22px;
+border-style: dotted dashed solid double;
+padding: 30px;
+
+}
+
+a {
+text-decoration: none;
+color: #008CBA;
+}
+
+
+</style>
+
+<!--This is the content for my Nav Bar-->
+<ul>
+<li><a href="Milestone 4.html">Milestone 4</a></li>
+<li><a href="Milestone 3.html">Milestone 3</a></li>
+<li><a href="Milestone 2.html">Milestone 2</a></li>
+<li><a href="Milestone 1.html">Milestone 1</a></li>
+<li><a href="index.html">Homepage</a></li>
+</ul>
+
+
+<body>
+  <div id="book-container"></div>
+
+  <!-- jQuery CDN (optional, if you decide to use jQuery for other functionality) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    // Your JavaScript code here
+    // Fetch and display book information
+    fetch('https://www.googleapis.com/books/v1/volumes/Wfan6L9RGgYC')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data); // Check the console to see the structure of the data
+        // Call function to display data on the webpage
+        displayBookInfo(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+
+    function displayBookInfo(bookData) {
+      // Extract relevant information from the bookData
+      const title = bookData.volumeInfo.title;
+      const authors = bookData.volumeInfo.authors.join(', ');
+      const description = bookData.volumeInfo.description;
+      const thumbnail = bookData.volumeInfo.imageLinks.thumbnail;
+
+      // Construct HTML elements to display the book information
+      const bookInfoHTML = `
+        <div class="book-info">
+          <img src="${thumbnail}" alt="Book Cover">
+          <div class="details">
+            <h2>${title}</h2>
+            <p><strong>Authors:</strong> ${authors}</p>
+            <p><strong>Description:</strong> ${description}</p>
+          </div>
+        </div>
+      `;
+
+      // Append the HTML to a container on the webpage (e.g., a div with id="book-container")
+      document.getElementById('book-container').innerHTML = bookInfoHTML;
+    }
+  </script>
+</body>
+</html>
