@@ -1,4 +1,90 @@
 <!DOCTYPE html>
-<html>
-milestone pt 2
+<html lang="en">
+<!--This is the Title and link to my CSS-->
+<head>
+    <title>Laura's Milestone 1</title>
+    <link rel="stylesheet" href="WebpageStyle.css">
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Information</title>
+    <style>
+
+    h1 {
+    text-align: center;
+
+    color: #4CAF50;
+    font-family: Garamond;
+    font-size: 50px;
+    padding:0px;
+    margin: 0px;
+
+    }
+
+    p {
+
+    text-align: left;
+    letter-spacing: 2.5px;
+    font-family: Garamond;
+    font-size: 22px;
+    border-style: dotted dashed solid double;
+    padding: 30px;
+
+    }
+
+    a {
+    text-decoration: none;
+    color: #008CBA;
+    }
+</style>
+</head>
+<body>
+    <div id="books-container"></div>
+
+    <script>
+        fetch('https://www.googleapis.com/books/v1/volumes?q=modern%20web')
+            .then(response => response.json())
+            .then(data => {
+                const booksContainer = document.getElementById('books-container');
+
+                data.items.forEach(item => {
+                    const volumeInfo = item.volumeInfo;
+                    const authors = volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Unknown Author';
+                    const thumbnail = volumeInfo.imageLinks ? volumeInfo.imageLinks.thumbnail : 'https://via.placeholder.com/100x150.png?text=No+Image';
+
+                    const bookDiv = document.createElement('div');
+                    bookDiv.classList.add('book');
+
+                    const img = document.createElement('img');
+                    img.src = thumbnail;
+                    bookDiv.appendChild(img);
+
+                    const infoDiv = document.createElement('div');
+                    infoDiv.classList.add('book-info');
+
+                    const title = document.createElement('div');
+                    title.classList.add('book-title');
+                    title.textContent = volumeInfo.title;
+                    infoDiv.appendChild(title);
+
+                    const authorsDiv = document.createElement('div');
+                    authorsDiv.classList.add('book-authors');
+                    authorsDiv.textContent = 'By ' + authors;
+                    infoDiv.appendChild(authorsDiv);
+
+                    const description = document.createElement('div');
+                    description.classList.add('book-description');
+                    description.innerHTML = volumeInfo.description ? volumeInfo.description : '<em>No description available</em>';
+                    infoDiv.appendChild(description);
+
+                    bookDiv.appendChild(infoDiv);
+
+                    booksContainer.appendChild(bookDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    </script>
+</body>
 </html>
