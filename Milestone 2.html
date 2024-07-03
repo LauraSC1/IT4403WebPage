@@ -59,6 +59,53 @@ color: #008CBA;
 </ul>
 
 
-<b> Milestone 2 </b>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script>
+function function2() {
+  var result = document.getElementById('search-text').value;
+  $.ajax({
+    url: "https://www.googleapis.com/books/v1/volumes?q=" + result,
+    type: 'GET',
+    dataType: 'json', // added data type
+    success: handleResponse
+  });
+
+  function handleResponse(res) {
+    $.each(res.items, function(i, item) {
+        var title = item.volumeInfo.title,
+          author = item.volumeInfo.authors[0],
+          thumb = item.volumeInfo.imageLinks.thumbnail,
+          volumeID = item.id;
+        var elTitle = $('<h3 class="title"></h3>').html(title),
+          elAuthor = $('<h4 class="author"></h4>').html(author),
+          elThumb = $('<img src="" alt="" class="thumbnail">').attr('src', thumb),
+          elVid = $('<a href="https://www.googleapis.com/books/v1/volumes/' + volumeID + '">Book Details</a>');
+
+
+        $('#result').append(elTitle, elAuthor, elThumb,elVid);
+    })
+  }
+}
+</script>
+
+
+<body>
+  <h1>Book search page</h1>
+  <div class="main-body">
+    <form id="form">
+      <div class="form-group">
+        <label for="usr">Enter Book Name</label>
+        <input type="search" class="form-control" id="search-text">
+      </div>
+      <div class="search-button">
+        <button onclick="function2();" type="button" id="search-button" class="btn btn-default">Search</button>
+      </div>
+    </form>
+    <div id="result">
+    </div>
+  </div>
+</body>
+
 
 </html>
