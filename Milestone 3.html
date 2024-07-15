@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<html lang="en">
+
 <html>
 
 <!--This is the Title and link to my CSS-->
@@ -49,16 +51,215 @@ color: #008CBA;
 
 </style>
 
-<!--This is the content for my Nav Bar-->
-<ul>
-<li><a href="Milestone 4.html">Milestone 4</a></li>
-<li><a href="Milestone 3.html">Milestone 3</a></li>
-<li><a href="Milestone 2.html">Milestone 2</a></li>
-<li><a href="Milestone 1.html">Milestone 1</a></li>
-<li><a href="index.html">Homepage</a></li>
-</ul>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+    <script>
+
+$(document).ready(function() {
+
+    const SearchButton = $("#SearchBtn");
+    const SearchInput = $("#InputTextBox");
+    let bookBox = []
+    let BookContainer;
+    const BookShelfContainer = $("#BookDisplay");
+    let page = 0;
+    let maxPages = 5;
+
+    // heres the event listener for the search button
+    SearchButton.click(async function (e) {
+    
+        e.preventDefault();
+
+        //search term input
+        const searchTerm = SearchInput.val().trim();
+
+        
+        if (searchTerm !== "") {
+            
+            const results = await GetBookSearchResults(searchTerm, page);
+
+            
+            if (results) {
+
+                // if book container does not exisit then create it
+                if (BookContainer === undefined) {
+                    BookContainer = $("<div>").attr("id", "BookBlock").insertAfter("#Placeholder");
+                } else {
+                    // empty it if not undefined
+                    BookContainer.empty();
+                }
+                //clear the book collection
+                bookBox = [];
+                // add results to book box collection
+                for (let book of results.items) {
+                    bookBox.push(book);
+                }
+                // if the results are less than 50, call getbooks results/10 times for each page, and set maxpages to the number of pages
+                if (results.totalItems < 50) {
+                    maxPages = Math.ceil(results.totalItems / 10);
+                    for (let i = 1; i < maxPages; i++) {
+                        const results = await GetBookSearchResults(searchTerm, i);
+                        for (let book of results.items) {
+                            bookBox.push(book);
+                        }
+                    }
+                } else {
+                    // otherwise, just pull the first 50 results for the bookbox
+                    for (let i = 1; i < 5; i++) {
+                        const results = await GetBookSearchResults(searchTerm, i);
+                        for (let book of results.items) {
+                            bookBox.push(book);
+                        }
+                    }
+                }
+                //draw the books to the screen
+                DrawBooksToScreen(bookBox, page, BookContainer);
+                PopulatePageButtons(1, maxPages);
+            }
+        }
+        // if a page button is clicked, change the page and redraw the books
+
+    });
+
+    // if a page button is clicked, change the page and redraw the books
+    $(document).on("click", ".pageButton", async function (e) {
+        e.preventDefault();
+        BookContainer.empty();
+        const selectedPage = $(this).data('page');
+        page = selectedPage - 1;
+        DrawBooksToScreen(bookBox, page, BookContainer);
+        PopulatePageButtons(1, maxPages);
+    });
+
+    async function GetBookShelfBooks(userID, shelfID) {
+        let bookshelfBooks = await $.getJSON(`https://www.googleapis.com/books/v1/users/${userID}/bookshelves/${shelfID}/volumes`);
+        for(let book of bookshelfBooks.items){
+            console.log(book)
+            let bookDiv = $("<div>").attr("id", "BookSearchResults").appendTo(BookShelfContainer);
+            bookDiv.click(function(){
+                console.log(book)
+                DisplayBookDetails(book);
+            })
+            // if the book has no image, use a filler image
+            if (!book.volumeInfo.imageLinks) {
+                let bookImg = $("<img>").attr("src", ".missingcover.jpg").appendTo(bookDiv);
+                // update the book so later when we look, we can just use missingCover
+                book.volumeInfo.imageLinks = {thumbnail: ".missingcover.jpg"}
+            } else {
+                let bookImg = $("<img>").attr("src", book.volumeInfo.imageLinks.thumbnail).appendTo(bookDiv);
+            }
+            let bookTitle = $("<h2>").text(book.volumeInfo.title).appendTo(bookDiv);
+        }
+    }
+
+    function GetBookSearchResults(searchString, page) {
+        //this function should make an API call to get the search results
+        return $.getJSON("https://www.googleapis.com/books/v1/volumes?q=" + searchString + "&startIndex=" + page * 10, function (data) {
+            return data;
+        });
+    }
+
+    function DrawBooksToScreen(books, page, BookContainer) {
+        
+        let rangeMin = page * 10;
+        let rangeMax = page * 10 + 10;
+        
+        for (let i = rangeMin; i < rangeMax; i++) {
+            let bookDiv = $("<div>").attr("id", "BookSearchResults").appendTo(BookContainer);
+            
+            bookDiv.click(function(){
+                console.log(books[i])
+                DisplayBookDetails(books[i]);
+            })
+            
+            if (!books[i].volumeInfo.imageLinks) {
+                let bookImg = $("<img>").attr("src", ".missingcover.jpg").appendTo(bookDiv);
+
+                books[i].volumeInfo.imageLinks = {thumbnail: ".missingcover.jpg"}
+            } else {
+                let bookImg = $("<img>").attr("src", books[i].volumeInfo.imageLinks.thumbnail).appendTo(bookDiv);
+            }
+            let bookTitle = $("<h2>").text(books[i].volumeInfo.title).appendTo(bookDiv);
+        }
+    }
+
+    function PopulatePageButtons(minPage, maxPages) {
+        //this function should populate the page buttons
+        let PageContainer = $("#PaginateButtons");
+        PageContainer.empty();
+        for (let i = minPage; i <= maxPages; i++) {
+            // create buttons that change the page when clicked
+            let pageButton = $("<button>").text(i).addClass("pageButton").attr("data-page", i).appendTo(PageContainer);
+        }
+    }
+
+    async function DisplayBookDetails(book){
+
+        
+        let bookDetails = $("#BookDetails");
+        bookDetails.empty();
+
+        let volumeInfo = book.volumeInfo;
+        let title = volumeInfo.title;
+        let authors = volumeInfo.authors ? volumeInfo.authors.join(', ') : '';
+        let publisher = volumeInfo.publisher ? volumeInfo.publisher : "Unknown";
+        let publishedDate = volumeInfo.publishedDate ? volumeInfo.publishedDate : "Unknown";
+        let description = volumeInfo.description? volumeInfo.description : "No description available";
+        let pageCount = volumeInfo.pageCount ? volumeInfo.pageCount : "Unknown";
+        let imageLink = volumeInfo.imageLinks.thumbnail;
+        
+        
+        if (bookDetails.length === 0) {
+            bookDetails = $("<div>").attr("id", "BookDetails").insertAfter("#SearchBar");
+        }
+
+        else {
+            bookDetails.empty();
+        }
+        let html = `
+            <div class="book">
+                <h2>${title}</h2>
+                <p><strong>Authors:</strong> ${authors}</p>
+                <p><strong>Publisher:</strong> ${publisher}</p>
+                <img src="${imageLink}" alt="${title}" />
+                <p><strong>Published Date:</strong> ${publishedDate}</p>
+                <p><strong>Page Count:</strong> ${pageCount}</p>
+                <p><strong>Description:</strong> ${description}</p>
+            </div>
+        `;
+        bookDetails.append(html);
 
 
-<b> Milestone 3 </b>
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+}
+)
+    </script>
 
+<body>
+
+    <!--This is the content for my Nav Bar-->
+    <ul>
+    <li><a href="Milestone 4.html">Milestone 4</a></li>
+    <li><a href="Milestone 3.html">Milestone 3</a></li>
+    <li><a href="Milestone 2.html">Milestone 2</a></li>
+    <li><a href="Milestone 1.html">Milestone 1</a></li>
+    <li><a href="index.html">Homepage</a></li>
+    </ul>
+
+    <h1>Book Search Page</h1>
+
+    <div class= "content">
+        <label for="usr">Enter Book Name:</label>
+        <input id="InputTextBox">
+        <button id="SearchBtn"> Search</button>
+
+
+    </div>
+    <div id="Placeholder"></div>
+    <div id="PaginateButtons"></div>
+    <div id="BookDisplay"></div>
+</body>
 </html>
