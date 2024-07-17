@@ -1,0 +1,232 @@
+
+
+/* This is style for grid*/
+.gridView {
+    display: inline-block;
+    width: 200px; 
+    height: 200px; 
+    margin: 0.3%;
+    padding: 2%;
+    padding-left: 20px;
+    border: thick dashed #6d813c;
+    background-color: #9dbb7c;
+}
+
+/* This is style for list */
+.listView {
+    display: block;
+    width: 200px; 
+    height: 200px; 
+    margin: 0.3%;
+    padding: 2%;
+    margin-left: 540px;
+    border: thick dashed #6d813c;
+    background-color: #9dbb7c;
+}
+
+/* Line 25 to 45 formats images to look nice in the boxes */
+.bookdiv img {
+    width: 100%; /* Ensures the image fills its container */
+    height: auto; /* Maintains aspect ratio */
+    max-width: 100%; /* Limits image size to container width */
+    max-height: 200px; 
+    object-fit: cover; /* Ensures the image covers the container */
+}
+
+.bookdiv img {
+    max-width: 100%; /* Ensures the image does not exceed the width of its container */
+    height: auto; /* Maintains aspect ratio */
+}
+
+.bookdiv a {
+    display: block; /* Ensures text wraps within the box */
+    text-decoration: none;
+    overflow: hidden; /* Ensures text does not overflow */
+    text-overflow: ellipsis; 
+    white-space: nowrap; /* Prevents text from wrapping */
+}
+
+/* Line 47 to 83 is Nav Bar Style */
+/* Inline Nav Bar */
+li {
+    display: inline;
+  }
+
+/* Block Nav Bar */
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #ffffff;
+  }
+  
+  /* This is how the block nav bar is on the right */
+  li {
+    float: right;
+  }
+  
+  /* Right-aligned section inside the top navigation */
+.topnav-right {
+    float: right;
+     list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #ffffff;
+  }
+  
+  /* Style for inside the block nav bar*/
+  li a {
+    display: block;
+    color: rgb(0, 0, 0);
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+
+/* Line 86 to 123 Centers Content */
+/* Reset default margins and padding for body and header */
+body, header {
+    margin: 0;
+    padding: 0;
+}
+
+/* Center content */
+.content {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px; /* Add padding for spacing */
+}
+
+/* Style form */
+#searchForm {
+    text-align: center; /* Center align the form */
+    margin-top: 10px;
+    margin-bottom: 5px; /* Add some bottom margin for spacing */
+}
+
+#searchTerm {
+    padding: 10px; /* Add padding to input field */
+    width: 300px; /* Set a fixed width or adjust as needed */
+    font-size: 16px; /* Adjust font size */
+}
+
+#searchForm button {
+    padding: 10px 20px; /* Add padding to the button */
+    font-size: 16px; /* Adjust font size */
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text color */
+    border: none; /* Remove border */
+    cursor: pointer; /* Add cursor pointer */
+}
+
+#searchForm button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+
+/* Center ToggleView */
+#ToggleView {
+    text-align: center; /* Center align the form */
+    margin-bottom: 20px; /* Add some bottom margin for spacing */
+}
+
+/* Center Book Shelf Title */
+#bookshelfTitle {
+    text-align: center; /* Center align the form */
+    margin-bottom: 20px; /* Add some bottom margin for spacing */
+}
+
+
+/* Button Color */
+#ToggleView {
+    color: #9dbb7c; /* Text color for ToggleView */
+}
+
+/* Styling for listView and gridView buttons */
+#ToggleView a {
+    color: #9dbb7c;
+    text-decoration: none;
+    padding: 5px 10px;
+}
+
+#ToggleView a:hover {
+    background-color: #e9ebd5;
+    color: #6d813c;
+}
+
+/* Tab Button & Tab Book Shelf Button Style & Center */
+
+/* Centering the tab buttons */
+#tabs {
+    text-align: center; /* Center-aligns the content inside #tabs */
+}
+
+.tab-button {
+    display: inline-block; /* Ensures the buttons are displayed in a line */
+    margin: 10px; /* Adjust margin as needed for spacing */
+    padding: 8px 16px; /* Padding for the buttons */
+    font-size: 16px; /* Font size of the buttons */
+    cursor: pointer; /* Cursor style on hover */
+    background-color: #4CAF50; /* Background color */
+    color: white; /* Text color */
+    border: none; /* Removes default button border */
+    border-radius: 4px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+.tab-button.active {
+    background-color: #008CBA; /* Background color when button is active */
+}
+
+.tab-button:hover {
+    background-color: #45a049; /* Background color on hover */
+}
+
+/* Styling for pagination buttons */
+#pageNumberButtons {
+    text-align: center; /* Center-aligns the pagination buttons */
+    margin-top: 20px; /* Adjust margin as needed */
+}
+
+#pageNumberButtons .pageButton {
+    display: inline-block; /* Ensures buttons appear in a line */
+    margin: 5px; /* Adjust margin for spacing between buttons */
+    padding: 8px 16px; /* Padding inside the buttons */
+    font-size: 14px; /* Font size of the button text */
+    cursor: pointer; /* Cursor style on hover */
+    background-color: #4CAF50; /* Default background color */
+    color: white; /* Text color */
+    border: none; /* Removes default button border */
+    border-radius: 4px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+
+/* BOOK DIV 
+.bookdiv {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+    .bookdiv img {
+        max-width: 100px;
+        margin-bottom: 10px;
+    }
+
+    .bookdiv a {
+        color: #000;
+        text-decoration: none;
+    }
+
+        .bookdiv a:hover {
+            text-decoration: underline;
+        }
+*/
