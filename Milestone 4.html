@@ -1,13 +1,21 @@
+
 <!DOCTYPE html>
 <html>
 
 <!--This is the Title and link to my CSS-->
 <head>
     <title>Laura's Milestone 4</title>
-    <link rel="stylesheet" href="WebpageStyle.css">
+    <link rel="stylesheet" href="Milestone4Style.css">
+
+    <!-- Import jQuery library for making AJAX requests and DOM manipulation -->
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <!-- Import Mustache.js library for templating -->
+    <script src="https://cdn.jsdelivr.net/npm/mustache@4.2.0/mustache.min.js"></script>
+
 </head>
 
-<!-- This is to center the webpage -->
+
+<!-- This is to center the webpage & Styles my H1 & Paragraph -->
 <style>
     .content {
     max-width: 1000px;
@@ -22,9 +30,21 @@
 h1 {
 text-align: center;
 
-color: #4CAF50;
+color: #6d813c;
 font-family: Garamond;
 font-size: 50px;
+font-style: bold;
+padding:0px;
+margin: 0px;
+
+}
+
+h2 {
+text-align: center;
+color: #7d9b4c;
+font-family: Garamond;
+font-size: 40px;
+font-style: italic;
 padding:0px;
 margin: 0px;
 
@@ -49,16 +69,264 @@ color: #008CBA;
 
 </style>
 
-<!--This is the content for my Nav Bar-->
-<ul>
-<li><a href="Milestone 4.html">Milestone 4</a></li>
-<li><a href="Milestone 3.html">Milestone 3</a></li>
-<li><a href="Milestone 2.html">Milestone 2</a></li>
-<li><a href="Milestone 1.html">Milestone 1</a></li>
-<li><a href="index.html">Homepage</a></li>
-</ul>
+<!-- Mustache templates -->
+<script id="TemplateforBook" type="x-tmpl-mustache">
+    <div class="bookdiv {{layout}}">
+        <img src="{{cover}}" alt="{{title}}">
+        <a href="bookinfo.html?id={{id}}">{{title}}</a>
+    </div>
+</script>
+
+<script>
+    $(function () {
+        // Define constants and variables
+        const resultsPerPage = 10; // Number of results per page
+        let activeResults = []; // Array to hold current search results
+        let currentPage = 1; // Current page number
+        let totalResults = 0; // Total number of search results
+        let searchTerm = ""; // Search term entered by the user
+        const pageCountToShow = 5; // Number of pagination buttons to show
+        const apiKey = ''; // Google Books API key
+
+        // Handle the search form submission
+        $("#searchForm").on("submit", function (event) {
+            event.preventDefault(); // Prevent the default form submission
+            searchTerm = $("#searchTerm").val(); // Get the search term from the input field
+            currentPage = 1; // Reset to the first page of results
+            fetchBooks(searchTerm); // Fetch books based on the search term
+        });
+
+        // Handle pagination button clicks
+        $("#pageNumberButtons").on("click", ".pageButton", function () {
+            currentPage = parseInt($(this).attr("data-page")); // Get the page number from the button's data attribute
+            fetchBooks(searchTerm); // Fetch books for the selected page
+        });
+
+        // Function to fetch books from the Google Books API
+        function fetchBooks(term) {
+            const startIndex = (currentPage - 1) * resultsPerPage; // Calculate the start index for the results
+            const parameter = `?q=${term}&startIndex=${startIndex}&maxResults=${resultsPerPage}&key=${apiKey}`; // API query parameters
+            const servicePoint = `https://www.googleapis.com/books/v1/volumes${parameter}`; // API endpoint URL
+
+            $.ajax({
+                url: servicePoint, // API endpoint
+                method: 'GET', // HTTP method
+                dataType: 'json', // Expected response data type
+                success: function (json) {
+                    // On success, update the results and pagination
+                    activeResults = json.items || []; // Store the search results
+                    totalResults = json.totalItems; // Store the total number of results
+                    $("#total").text(totalResults); // Display the total number of results
+                    $("#searchedTerm").text(term); // Display the search term
+                    displayBooks(activeResults); // Display the search results
+                    generatepageNumberButtons(currentPage, pageCountToShow, Math.ceil(totalResults / resultsPerPage)); // Generate pagination buttons
+                },
+                error: function () {
+                    alert("Error fetching data from Google Books API."); // Alert on API request failure
+                }
+            });
+        }
+
+        // Function to display books in the results section
+        function displayBooks(books) {
+            const resultsDiv = $("#results");
+            resultsDiv.empty(); // Clear previous results
+
+            // Get the Mustache template for book items
+            const template = $("#TemplateforBook").html();
+            const layout = $("#box").attr("data-layout") === "Grid" ? "gridView" : "listView";
+
+            // Loop through each book and create HTML for each book
+            books.forEach(book => {
+                const cover = book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.smallThumbnail : "https://via.placeholder.com/50x75.png?text=No+Image"; // Get the book cover image
+                const title = book.volumeInfo.title || "No title available"; // Get the book title
+                const bookId = book.id; // Get the book ID
+                const rendered = Mustache.render(template, {
+                    cover,
+                    title,
+                    id: bookId,
+                    layout
+                });
+                resultsDiv.append(rendered); // Add the book HTML to the results container
+            });
+
+            updateBookDisplay(); // Update the display based on the current layout
+        }
+
+        // Function to update book display based on the current layout
+        function updateBookDisplay() {
+            const layout = $("#box").attr("data-layout") === "Grid" ? "gridView" : "listView";
+            $(".bookdiv").removeClass("gridView listView").addClass(layout); // Update book display to current layout
+        }
+
+        // Function to fetch books from the public bookshelf
+        function fetchBookshelf() {
+            const userId = '104939054151663932487'; // User ID for the bookshelf
+            const shelfId = '0'; // Shelf ID (0 for the default shelf)
+            const servicePoint = `https://www.googleapis.com/books/v1/users/${userId}/bookshelves/${shelfId}/volumes?key=${apiKey}`; // API endpoint URL
+
+            $.ajax({
+                url: servicePoint, // API endpoint
+                method: 'GET', // HTTP method
+                dataType: 'json', // Expected response data type
+                success: function (json) {
+                    const bookshelfResults = $("#bookshelfResults");
+                    bookshelfResults.empty(); // Clear previous bookshelf results
+
+                    // Get the Mustache template for book items
+                    const template = $("#TemplateforBook").html();
+                    const layout = "grid-item";
+
+                    // Loop through each book and create HTML for each book
+                    json.items.forEach(book => {
+                        const cover = book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.smallThumbnail : "https://via.placeholder.com/50x75.png?text=No+Image"; // Get the book cover image
+                        const title = book.volumeInfo.title || "No title available"; // Get the book title
+                        const bookId = book.id; // Get the book ID
+                        const rendered = Mustache.render(template, {
+                            cover,
+                            title,
+                            id: bookId,
+                            layout
+                        });
+                        bookshelfResults.append(rendered); // Add the book HTML to the bookshelf results container
+                    });
+
+                    $("#bookshelfTitle").show(); // Show the public bookshelf title
+                },
+                error: function () {
+                    alert("Error fetching books from public bookshelf in Google Books API."); // Alert on API request failure
+                }
+            });
+        }
+
+        // Function to generate pagination buttons
+        function generatepageNumberButtons(currentPage, pageCountToShow, MaxPage) {
+            let buttondiv = $("#pageNumberButtons").empty(); // Clear previous buttons
+
+            // Calculate the start and end page numbers for pagination
+            let startPage = Math.max(currentPage - Math.floor(pageCountToShow / 2), 1);
+            let endPage = Math.min(startPage + pageCountToShow - 1, MaxPage);
+            startPage = Math.max(endPage - pageCountToShow + 1, 1);
+
+            // Create the "Previous" button if not on the first page
+            if (currentPage > 1) {
+                $("<button>")
+                    .addClass("pageButton")
+                    .attr("data-page", currentPage - 1)
+                    .text("Previous")
+                    .appendTo(buttondiv);
+            }
+
+            // Create page number buttons
+            for (let i = startPage; i <= endPage; i++) {
+                $("<button>")
+                    .addClass("pageButton")
+                    .attr("data-page", i)
+                    .text(i)
+                    .appendTo(buttondiv);
+            }
+
+            // Create the "Next" button if not on the last page
+            if (currentPage < MaxPage) {
+                $("<button>")
+                    .addClass("pageButton")
+                    .attr("data-page", currentPage + 1)
+                    .text("Next")
+                    .appendTo(buttondiv);
+            }
+
+            // Highlight the current page button
+            $(`#pageNumberButtons button[data-page="${currentPage}"]`).addClass("current");
+        }
+
+        // Event handlers for toggling between list view and grid view
+        $("#ToggleView").on("click", "#btnList", function () {
+            $("#box").attr("data-layout", "List"); // Set layout to list view
+            $(".bookdiv").removeClass("gridView").addClass("listView"); // Update book display to list view
+        });
+
+        $("#ToggleView").on("click", "#btnGrid", function () {
+            $("#box").attr("data-layout", "Grid"); // Set layout to grid view
+            $(".bookdiv").removeClass("listView").addClass("gridView"); // Update book display to grid view
+        });
+
+        // Event handler for toggling between the search results and the public bookshelf
+        $("#tabs").on("click", "#tabSearch", function () {
+            $("#results").show(); // Show the search results section
+            $("#bookshelfResults").hide(); // Hide the public bookshelf section
+            $("#bookshelfTitle").hide(); // Hide the public bookshelf title
+            $("#tabSearch").addClass("active"); // Set the search results tab as active
+            $("#tabBookshelf").removeClass("active"); // Remove the active class from the public bookshelf tab
+        });
+
+        $("#tabs").on("click", "#tabBookshelf", function () {
+            fetchBookshelf(); // Fetch the books for the public bookshelf
+            $("#results").hide(); // Hide the search results section
+            $("#bookshelfResults").show(); // Show the public bookshelf section
+            $("#bookshelfTitle").show(); // Show the public bookshelf title
+            $("#tabSearch").removeClass("active"); // Remove the active class from the search results tab
+            $("#tabBookshelf").addClass("active"); // Set the public bookshelf tab as active
+        });
+
+        // Initialize with the search results tab active
+        $("#tabSearch").click();
+    });
+</script>
 
 
-<b> Milestone 4 </b>
+<header>
 
+    <!--This is the content for my Nav Bar-->
+    <ul>
+        <li><a href="bookshelf.html">My Bookshelf</a></li>
+        <li><a href="Milestone 4.html">Milestone 4</a></li>
+        <li><a href="Milestone 3.html">Milestone 3</a></li>
+        <li><a href="Milestone 2.html">Milestone 2</a></li>
+        <li><a href="Milestone 1.html">Milestone 1</a></li>
+        <li><a href="index.html">Homepage</a></li>
+        </ul>
+
+    <h1>Book Search Page</h1>
+
+    <!-- Form where users can enter search terms and submit their search -->
+    <form id="searchForm">
+        <input type="text" id="searchTerm" placeholder="Enter Book Name Here" required> <!-- Field where users enter their search term -->
+        <button type="submit">Search</button> <!-- Button to execute the search query -->
+    </form>
+
+            <!-- Buttons for toggling between search results and public bookshelf -->
+    <div id="tabs">
+        <button id="tabSearch" class="tab-button active">User's Search Results</button>
+        <button id="tabBookshelf" class="tab-button">Public Bookshelf</button>
+    </div>
+
+    <!-- Toggle View buttons -->
+    <div id="ToggleView">
+        <a href="#" id="btnList">List View</a> | <a href="#" id="btnGrid">Grid View</a>
+    </div>
+    
+</header>
+
+
+<body>
+
+    <div id="container">
+        
+        <!-- Public bookshelf title -->
+        <h2 id="bookshelfTitle" style="display: none;">Public Bookshelf</h2>
+
+        <!-- Display container for showcasing search results in a horizontal grid layout -->
+        <div id="results" class="grid-container"></div>
+
+        <!-- Container for showcasing books retrieved from the public bookshelf -->
+        <div id="bookshelfResults" class="grid-container" style="display: none;"></div>
+
+        <!-- Container for the pagination controls/buttons -->
+        <div id="pageNumberButtons"></div>
+
+
+    </div>
+
+    
+</body>
 </html>
